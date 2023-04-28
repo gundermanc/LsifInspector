@@ -32,11 +32,11 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                
+
                 <TextBlock 
                     Grid.Row="0"
                     Margin="10,5,0,-5"
-                    Text="LSIF File content" />
+                    Text="LSIF File content. Click to see neighbors." />
 
                 <TextBox x:Name="LSIFText"
                          Grid.Row="1"
@@ -59,7 +59,7 @@
                 <TextBlock 
                     Grid.Row="0"
                     Margin="10,5,0,-5"
-                    Text="Immediate Neighbors" />
+                    Text="Immediate Neighbors. Click to highlight in left pane." />
 
                 <StackPanel x:Name="Preview"
                             Background="White"

@@ -1,12 +1,11 @@
 ﻿namespace LSIFInspector
 {
     using System.IO;
-    using System.Net;
     using System.Text;
     using System.Text.Json;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Documents;
+    using System.Windows.Input;
     using System.Windows.Media;
     using Microsoft.Win32;
     using static LSIFInspector.LsifGraph;
@@ -21,11 +20,17 @@
         public MainWindow()
         {
             InitializeComponent();
+
+            this.KeyUp += OnKeyUp;
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl) &&
+                e.Key == Key.F)
+            {
+                this.OnFind(null!, null!);
+            }
         }
 
         private void OnFileOpenClicked(object sender, RoutedEventArgs e)
