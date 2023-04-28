@@ -183,6 +183,7 @@
 
                     this.LSIFText.SelectionStart = characterIndex;
                     this.LSIFText.SelectionLength = lineLength;
+                    this.LSIFText.ScrollToLine(item.lineNumber!.Value);
                     this.LSIFText.Focus();
                 };
 
