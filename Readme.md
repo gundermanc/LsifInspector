@@ -4,6 +4,8 @@
 
 LSIF inspector is a trivial, hacky WPF application for browsing files in Microsoft's [Language Server Index Format](https://microsoft.github.io/language-server-protocol/overviews/lsif/overview/).
 
+It implements support for click-based traversal of the LSIF graph. Simply open a file, click a row to see its neighbors, and click a neighbor to traverse the graph.
+
 ## Capabilities
 - File > Open arbitrary LSIF files.
 - Indent LSIF content by project and document begin and end `$event` scopes.
