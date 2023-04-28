@@ -6,6 +6,13 @@ LSIF inspector is a trivial, hacky WPF application for browsing files in Microso
 
 It implements support for click-based traversal of the LSIF graph. Simply open a file, click a row to see its neighbors, and click a neighbor to traverse the graph.
 
+## Other useful resources
+
+- [Language Server Index Format Spec](https://microsoft.github.io/language-server-protocol/specifications/lsif/0.6.0/specification/) - Describes the specification for LSIF.
+- ['lsif-debug' command line tools](https://github.com/nTaylorMullen/lsif-debug) - Command line tool for various LSIF validation and debugging workflows.
+  - 'visualize' - Opens a workspace in VS Code, using LSIF to power language features.
+  - 'flatten' - Transforms LSIF to be more human readable and/or determinisitic, enabling easier text-based inspection and even diffing of two LSIF files to see what changed.
+
 ## Capabilities
 - File > Open arbitrary LSIF files.
 - Indent LSIF content by project and document begin and end `$event` scopes.
