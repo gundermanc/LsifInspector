@@ -183,6 +183,7 @@
 
                     this.LSIFText.SelectionStart = characterIndex;
                     this.LSIFText.SelectionLength = lineLength;
+                    this.LSIFText.Focus();
                 };
 
                 this.Preview.Children.Add(textBlock);
