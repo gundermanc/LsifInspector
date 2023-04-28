@@ -118,7 +118,11 @@
                 this.LSIFText.SelectionBrush = Brushes.Green;
 
                 // Add edge origin.
+                PopulateHeaderItem("Edge Goes from vertex: ---------------------------------");
+
                 this.PopulateItem(deserializedLine.outV);
+
+                PopulateHeaderItem("Edge Goes to verticies: --------------------------------");
 
                 this.PopulateItem(deserializedLine.inV);
 
@@ -134,6 +138,8 @@
             {
                 this.LSIFText.SelectionBrush = Brushes.Blue;
 
+                PopulateHeaderItem("Vertex has outgoing edges: -----------------------------");
+
                 if (deserializedLine?.id is not null &&
                     this.graph.EdgesByOutVertexId.TryGetValue(deserializedLine.id.Value, out var departingEdges))
                 {
@@ -142,6 +148,8 @@
                         PopulateItem(edge.id);
                     }
                 }
+
+                PopulateHeaderItem("Vertex has incoming edges: -----------------------------");
 
                 if (deserializedLine?.id is not null &&
                     this.graph.EdgesByInVertexId.TryGetValue(deserializedLine.id.Value, out var arrivingEdges))
@@ -152,11 +160,13 @@
                     }
                 }
             }
+        }
 
-            if (this.Preview.Children.Count is 0)
-            {
-                this.Preview.Children.Add(new TextBlock() { FontSize = 20, Text = "This item has no immediate neighbors" });
-            }
+        private void PopulateHeaderItem(string header)
+        {
+            var textBlock = new TextBlock() { FontSize = 20, Text = header, HorizontalAlignment = HorizontalAlignment.Left, FontWeight = FontWeight.FromOpenTypeWeight(100), TextAlignment = TextAlignment.Left };
+
+            this.Preview.Children.Add(textBlock);
         }
 
         private void PopulateItem(int? id)
@@ -164,7 +174,7 @@
             if (id is not null &&
                 (this.graph?.VerticiesById.TryGetValue(id.Value, out var item) is true || (this.graph?.EdgesById.TryGetValue(id.Value, out item) is true)))
             {
-                var textBlock = new TextBlock() { FontSize = 20, Text = this.LSIFText.GetLineText(item.lineNumber!.Value), HorizontalAlignment = HorizontalAlignment.Left };
+                var textBlock = new TextBlock() { FontSize = 15, Text = this.LSIFText.GetLineText(item.lineNumber!.Value), HorizontalAlignment = HorizontalAlignment.Left, TextAlignment = TextAlignment.Left };
 
                 textBlock.MouseUp += (sender, e) =>
                 {
