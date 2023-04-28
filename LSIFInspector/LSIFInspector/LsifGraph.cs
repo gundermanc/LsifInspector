@@ -95,7 +95,7 @@
 
         public IReadOnlyDictionary<int, HashSet<EdgeOrVertex>> EdgesByInVertexId { get; }
 
-        public record EdgeOrVertex(int? id, string type, string label, int? outV, int? inV, int[] inVs, Uri uri, Position start, Position end, string? identifier, string? name, int? lineNumber);
+        public record EdgeOrVertex(int? id, string type, string label, int? outV, int? inV, int[] inVs, Uri uri, Position start, Position end, string? identifier, string? name, int? lineNumber, string? kind);
 
         public record Position(int? line, int? character);
     }

@@ -16,6 +16,9 @@
             <MenuItem Header="File">
                 <MenuItem Header="Open" Click="OnFileOpenClicked"/>
             </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Header="Find" Click="OnFind" />
+            </MenuItem>
         </Menu>
 
         <Grid Grid.Row="1">
@@ -26,9 +29,12 @@
 
             <TextBox x:Name="LSIFText"
                  Grid.Column="0"
+                 FontSize="15"
                  SelectionChanged="OnSelectionChanged"
                  Margin="10"
-                 IsReadOnly="True" />
+                 IsReadOnly="True"
+                 HorizontalScrollBarVisibility="Visible"
+                 VerticalScrollBarVisibility="Visible" />
 
             <StackPanel x:Name="Preview"
                         Grid.Column="1"

@@ -1,6 +1,8 @@
 ﻿namespace LSIFInspector
 {
     using System.IO;
+    using System.Net;
+    using System.Text;
     using System.Text.Json;
     using System.Windows;
     using System.Windows.Controls;
@@ -32,9 +34,40 @@
 
             if (openFile.ShowDialog() is true)
             {
-                this.LSIFText.Text = File.ReadAllText(openFile.FileName);
-                this.graph = LsifGraph.FromLines(File.ReadAllLines(openFile.FileName));
+                var lines = File.ReadAllLines(openFile.FileName);
+
+                this.LSIFText.Text = PreprocessLsif(lines);
+                this.graph = LsifGraph.FromLines(lines);
             }
+        }
+
+        private string PreprocessLsif(string[] lines)
+        {
+            var content = new StringBuilder();
+
+            int indent = 0;
+
+            foreach (var line in lines)
+            {
+                var deserializedLine = JsonSerializer.Deserialize<EdgeOrVertex>(line);
+
+                if (deserializedLine?.label == "$event")
+                {
+                    if (deserializedLine.kind == "begin")
+                    {
+                        indent += 4;
+                    }
+                    else if (deserializedLine.kind == "end")
+                    {
+                        indent -= 4;
+                    }
+                }
+
+                content.Append(new string(' ', indent));
+                content.AppendLine(line);
+            }
+
+            return content.ToString();
         }
 
         private void OnSelectionChanged(object sender, RoutedEventArgs e)
@@ -121,7 +154,7 @@
             if (id is not null &&
                 (this.graph?.VerticiesById.TryGetValue(id.Value, out var item) is true || (this.graph?.EdgesById.TryGetValue(id.Value, out item) is true)))
             {
-                var textBlock = new TextBlock() { Text = this.LSIFText.GetLineText(item.lineNumber!.Value) };
+                var textBlock = new TextBlock() { FontSize = 20, Text = this.LSIFText.GetLineText(item.lineNumber!.Value) };
 
                 textBlock.MouseUp += (sender, e) =>
                 {
@@ -133,6 +166,22 @@
                 };
 
                 this.Preview.Children.Add(textBlock);
+            }
+        }
+
+        private void OnFind(object sender, RoutedEventArgs e)
+        {
+            var findWindow = new FindWindow();
+
+            if (findWindow.ShowDialog() is true)
+            {
+                var matchIndex = this.LSIFText.Text.IndexOf(findWindow.FindText.Text);
+                if (matchIndex > -1)
+                {
+                    this.LSIFText.Focus();
+                    this.LSIFText.SelectionStart = matchIndex;
+                    this.LSIFText.ScrollToLine(this.LSIFText.GetLineIndexFromCharacterIndex(matchIndex));
+                }
             }
         }
     }
