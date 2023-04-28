@@ -27,18 +27,46 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBox x:Name="LSIFText"
-                 Grid.Column="0"
-                 FontSize="15"
-                 SelectionChanged="OnSelectionChanged"
-                 Margin="10"
-                 IsReadOnly="True"
-                 HorizontalScrollBarVisibility="Visible"
-                 VerticalScrollBarVisibility="Visible" />
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock 
+                    Grid.Row="0"
+                    Margin="10,5,0,-5"
+                    Text="LSIF File content" />
 
-            <StackPanel x:Name="Preview"
-                        Grid.Column="1"
-                        Margin="10" />
+                <TextBox x:Name="LSIFText"
+                         Grid.Row="1"
+                         FontSize="15"
+                         SelectionChanged="OnSelectionChanged"
+                         Margin="10"
+                         IsReadOnly="True"
+                         HorizontalScrollBarVisibility="Visible"
+                         VerticalScrollBarVisibility="Visible" />
+            </Grid>
+
+            <GridSplitter />
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock 
+                    Grid.Row="0"
+                    Margin="10,5,0,-5"
+                    Text="Immediate Neighbors" />
+
+                <StackPanel x:Name="Preview"
+                            Background="White"
+                            Grid.Row="1"
+                            Margin="10" 
+                            CanVerticallyScroll="True"/>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

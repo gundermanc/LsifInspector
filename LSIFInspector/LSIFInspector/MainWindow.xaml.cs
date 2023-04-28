@@ -147,6 +147,11 @@
                     }
                 }
             }
+
+            if (this.Preview.Children.Count is 0)
+            {
+                this.Preview.Children.Add(new TextBlock() { FontSize = 20, Text = "This item has no immediate neighbors" });
+            }
         }
 
         private void PopulateItem(int? id)
@@ -154,7 +159,7 @@
             if (id is not null &&
                 (this.graph?.VerticiesById.TryGetValue(id.Value, out var item) is true || (this.graph?.EdgesById.TryGetValue(id.Value, out item) is true)))
             {
-                var textBlock = new TextBlock() { FontSize = 20, Text = this.LSIFText.GetLineText(item.lineNumber!.Value) };
+                var textBlock = new TextBlock() { FontSize = 20, Text = this.LSIFText.GetLineText(item.lineNumber!.Value), HorizontalAlignment = HorizontalAlignment.Left };
 
                 textBlock.MouseUp += (sender, e) =>
                 {
