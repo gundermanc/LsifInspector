@@ -180,7 +180,9 @@
 
             if (findWindow.ShowDialog() is true)
             {
-                var matchIndex = this.LSIFText.Text.IndexOf(findWindow.FindText.Text);
+                var matchIndex = this.LSIFText.Text.IndexOf(
+                    findWindow.FindText.Text,
+                    this.LSIFText.SelectionStart + this.LSIFText.SelectionLength);
                 if (matchIndex > -1)
                 {
                     this.LSIFText.Focus();
