@@ -61,11 +61,16 @@
                     Margin="10,5,0,-5"
                     Text="Immediate Neighbors. Click to highlight in left pane." />
 
-                <StackPanel x:Name="Preview"
-                            Background="White"
-                            Grid.Row="1"
-                            Margin="10" 
-                            CanVerticallyScroll="True"/>
+                <ScrollViewer Background="White"
+                              Grid.Row="1"
+                              HorizontalAlignment="Stretch"
+                              Margin="10"
+                              VerticalAlignment="Stretch"
+                              VerticalScrollBarVisibility="Visible">
+                    <StackPanel x:Name="Preview"
+                                Background="White" 
+                                CanVerticallyScroll="True" />
+                </ScrollViewer>
             </Grid>
         </Grid>
     </Grid>
