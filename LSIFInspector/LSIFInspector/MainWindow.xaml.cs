@@ -29,6 +29,7 @@
             {
                 FontSize = 15,
                 IsReadOnly = true,
+                ShowLineNumbers = true,
             };
 
             this.textEditor.TextArea.SelectionChanged += this.OnSelectionChanged;
@@ -107,13 +108,13 @@
             if (this.textEditor.SelectionStart != selectionStartLineStart)
             {
                 this.textEditor.SelectionStart = selectionStartLineStart;
-                //e.Handled = true;
                 return;
             }
 
             if (this.textEditor.SelectionLength != selectionStartLineLength)
             {
                 this.textEditor.SelectionLength = selectionStartLineLength;
+                this.textEditor.ScrollTo(selectionStartLine, column: 0);
                 this.textEditor.ScrollToHorizontalOffset(0);
                 return;
             }
@@ -220,18 +221,17 @@
                     this.textEditor.Document.TextLength - startIndex,
                     StringComparison.OrdinalIgnoreCase);
 
+                this.textEditor.Focus();
+
                 if (matchIndex > -1)
                 {
-                    this.textEditor.SelectionStart = matchIndex;
-                    this.textEditor.ScrollToLine(this.graph.GetLineIndexFromCharacterIndex(matchIndex));
+                    this.textEditor.CaretOffset = matchIndex;
                 }
                 else
                 {
                     this.textEditor.SelectionStart = 0;
                     this.textEditor.ScrollToLine(0);
                 }
-
-                this.textEditor.Focus();
             }
         }
     }
