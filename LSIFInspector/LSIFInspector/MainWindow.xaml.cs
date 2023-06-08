@@ -1,12 +1,13 @@
 ﻿namespace LSIFInspector
 {
+    using System;
     using System.IO;
-    using System.Text;
     using System.Text.Json;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
     using System.Windows.Media;
+    using ICSharpCode.AvalonEdit;
     using Microsoft.Win32;
     using static LSIFInspector.LsifGraph;
 
@@ -15,16 +16,30 @@
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly TextEditor textEditor;
+
+        private bool loading;
         private LsifGraph? graph;
 
         public MainWindow()
         {
             InitializeComponent();
 
+            this.textEditor = new TextEditor()
+            {
+                FontSize = 15,
+                IsReadOnly = true,
+            };
+
+            this.textEditor.TextArea.SelectionChanged += this.OnSelectionChanged;
+            this.textEditor.TextArea.Caret.PositionChanged += this.OnSelectionChanged;
+
+            this.LSIFTextContainer.Content = this.textEditor;
+
             this.KeyUp += OnKeyUp;
         }
 
-        private void OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        private void OnKeyUp(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl) &&
                 e.Key == Key.F)
@@ -41,60 +56,36 @@
             {
                 var lines = File.ReadAllLines(openFile.FileName);
 
-                this.LSIFText.Text = PreprocessLsif(lines);
                 this.graph = LsifGraph.FromLines(lines);
-            }
-        }
 
-        private string PreprocessLsif(string[] lines)
-        {
-            var content = new StringBuilder();
-
-            int indent = 0;
-
-            foreach (var line in lines)
-            {
-                var deserializedLine = JsonSerializer.Deserialize<EdgeOrVertex>(line);
-
-                if (deserializedLine?.label == "$event")
+                try
                 {
-                    if (deserializedLine.kind == "begin")
+                    this.loading = true;
+
+                    this.textEditor.Clear();
+
+                    foreach (var line in this.graph.LineStrings)
                     {
-                        indent += 4;
-                    }
-                    else if (deserializedLine.kind == "end")
-                    {
-                        indent -= 4;
+                        this.textEditor.AppendText(line);
+                        this.textEditor.AppendText(Environment.NewLine);
                     }
                 }
-
-                content.Append(new string(' ', indent));
-                content.AppendLine(line);
+                finally
+                {
+                    this.loading = false;
+                }
             }
-
-            return content.ToString();
         }
 
-        private void OnSelectionChanged(object sender, RoutedEventArgs e)
+        private void OnSelectionChanged(object? sender, EventArgs e)
         {
-            var selectionStart = this.LSIFText.SelectionStart;
-            var selectionStartLine = this.LSIFText.GetLineIndexFromCharacterIndex(selectionStart);
-
-            var selectionStartLineStart = this.LSIFText.GetCharacterIndexFromLineIndex(selectionStartLine);
-            var selectionStartLineLength = this.LSIFText.GetLineLength(selectionStartLine);
-
-            // On click, adjust the selection to be the length of the line, for visibility.
-            if (this.LSIFText.SelectionStart != selectionStartLineStart)
+            // Ignore caret changes until loaded.
+            if (this.loading is true)
             {
-                this.LSIFText.SelectionStart = selectionStartLineStart;
                 return;
             }
 
-            if (this.LSIFText.SelectionLength != selectionStartLineLength)
-            {
-                this.LSIFText.SelectionLength = selectionStartLineLength;
-                return;
-            }
+            var selectionStart = this.textEditor.SelectionStart;
 
             if (selectionStart < 0 ||
                 this.graph is null)
@@ -102,7 +93,32 @@
                 return;
             }
 
-            var lineText = this.LSIFText.GetLineText(selectionStartLine);
+            var selectionStartLine = this.graph.GetLineIndexFromCharacterIndex(selectionStart);
+
+            if (selectionStartLine < 0)
+            {
+                return;
+            }
+
+            var selectionStartLineStart = this.graph.GetCharacterIndexFromLineIndex(selectionStartLine);
+            var selectionStartLineLength = this.graph.GetLineLength(selectionStartLine);
+
+            // On click, adjust the selection to be the length of the line, for visibility.
+            if (this.textEditor.SelectionStart != selectionStartLineStart)
+            {
+                this.textEditor.SelectionStart = selectionStartLineStart;
+                //e.Handled = true;
+                return;
+            }
+
+            if (this.textEditor.SelectionLength != selectionStartLineLength)
+            {
+                this.textEditor.SelectionLength = selectionStartLineLength;
+                this.textEditor.ScrollToHorizontalOffset(0);
+                return;
+            }
+
+            var lineText = this.graph.GetLineText(selectionStartLine);
 
             if (lineText is null)
             {
@@ -115,7 +131,7 @@
 
             if (deserializedLine?.type == "edge")
             {
-                this.LSIFText.SelectionBrush = Brushes.Green;
+                this.textEditor.TextArea.SelectionBrush = Brushes.Green;
 
                 // Add edge origin.
                 PopulateHeaderItem("Edge Goes from vertex: ---------------------------------");
@@ -136,7 +152,7 @@
             }
             else
             {
-                this.LSIFText.SelectionBrush = Brushes.Blue;
+                this.textEditor.TextArea.SelectionBrush = Brushes.Blue;
 
                 PopulateHeaderItem("Vertex has outgoing edges: -----------------------------");
 
@@ -174,17 +190,17 @@
             if (id is not null &&
                 (this.graph?.VerticiesById.TryGetValue(id.Value, out var item) is true || (this.graph?.EdgesById.TryGetValue(id.Value, out item) is true)))
             {
-                var textBlock = new TextBlock() { FontSize = 15, Text = this.LSIFText.GetLineText(item.lineNumber!.Value), HorizontalAlignment = HorizontalAlignment.Left, TextAlignment = TextAlignment.Left };
+                var textBlock = new TextBlock() { FontSize = 15, Text = this.graph.GetLineText(item.lineNumber!.Value), HorizontalAlignment = HorizontalAlignment.Left, TextAlignment = TextAlignment.Left };
 
                 textBlock.MouseUp += (sender, e) =>
                 {
-                    var characterIndex = this.LSIFText.GetCharacterIndexFromLineIndex(item.lineNumber.Value);
-                    var lineLength = this.LSIFText.GetLineLength(item.lineNumber.Value);
+                    var characterIndex = this.graph.GetCharacterIndexFromLineIndex(item.lineNumber.Value);
+                    var lineLength = this.graph.GetLineLength(item.lineNumber.Value);
 
-                    this.LSIFText.SelectionStart = characterIndex;
-                    this.LSIFText.SelectionLength = lineLength;
-                    this.LSIFText.ScrollToLine(item.lineNumber!.Value);
-                    this.LSIFText.Focus();
+                    this.textEditor.Focus();
+                    this.textEditor.SelectionStart = characterIndex;
+                    this.textEditor.SelectionLength = lineLength;
+                    this.textEditor.ScrollToLine(item.lineNumber!.Value);
                 };
 
                 this.Preview.Children.Add(textBlock);
@@ -197,15 +213,25 @@
 
             if (findWindow.ShowDialog() is true)
             {
-                var matchIndex = this.LSIFText.Text.IndexOf(
+                var startIndex = this.textEditor.SelectionStart + this.textEditor.SelectionLength;
+                var matchIndex = this.textEditor.Document.IndexOf(
                     findWindow.FindText.Text,
-                    this.LSIFText.SelectionStart + this.LSIFText.SelectionLength);
+                    startIndex,
+                    this.textEditor.Document.TextLength - startIndex,
+                    StringComparison.OrdinalIgnoreCase);
+
                 if (matchIndex > -1)
                 {
-                    this.LSIFText.Focus();
-                    this.LSIFText.SelectionStart = matchIndex;
-                    this.LSIFText.ScrollToLine(this.LSIFText.GetLineIndexFromCharacterIndex(matchIndex));
+                    this.textEditor.SelectionStart = matchIndex;
+                    this.textEditor.ScrollToLine(this.graph.GetLineIndexFromCharacterIndex(matchIndex));
                 }
+                else
+                {
+                    this.textEditor.SelectionStart = 0;
+                    this.textEditor.ScrollToLine(0);
+                }
+
+                this.textEditor.Focus();
             }
         }
     }

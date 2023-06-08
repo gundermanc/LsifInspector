@@ -24,7 +24,8 @@ It implements support for click-based traversal of the LSIF graph. Simply open a
 ## Known issues
 - Code quality - prototype quality. Could be better.
 - UI thread - everything is done on the UI thread. Haven't taken the time to optimize.
-- Performance and Scalability - Only really works with small LSIF samples indexing only a small number of projects.
+- Find feature doesn't really work.
 
 ## Change Log
+6/8/2023  - Performance improvements (update to AvalonEdit to enable usage with larger LSIF files).
 4/28/2023 - Initial prototype version.

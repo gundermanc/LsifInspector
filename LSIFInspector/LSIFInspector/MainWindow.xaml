@@ -38,14 +38,11 @@
                     Margin="10,5,0,-5"
                     Text="LSIF File content. Click to see neighbors." />
 
-                <TextBox x:Name="LSIFText"
-                         Grid.Row="1"
-                         FontSize="15"
-                         SelectionChanged="OnSelectionChanged"
-                         Margin="10"
-                         IsReadOnly="True"
-                         HorizontalScrollBarVisibility="Visible"
-                         VerticalScrollBarVisibility="Visible" />
+                <!-- Becomes the host for the Avalon Editor. -->
+                <ContentControl x:Name="LSIFTextContainer"
+                                Grid.Row="1"
+                                Margin="10"
+                                />
             </Grid>
 
             <GridSplitter />
