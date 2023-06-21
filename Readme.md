@@ -26,5 +26,6 @@ It implements support for click-based traversal of the LSIF graph. Simply open a
 - UI thread - everything is done on the UI thread. Haven't taken the time to optimize.
 
 ## Change Log
+- 6/21/2023 - Added 'Stats' view showing the percentage of lines of each dump that's attributable to each vertex or edge type.
 - 6/8/2023  - Performance improvements (update to AvalonEdit to enable usage with larger LSIF files) and line numbers.
 - 4/28/2023 - Initial prototype version.

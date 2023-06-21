@@ -1,7 +1,9 @@
 ﻿namespace LSIFInspector
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Text.Json;
     using System.Windows;
     using System.Windows.Controls;
@@ -233,6 +235,63 @@
                     this.textEditor.ScrollToLine(0);
                 }
             }
+        }
+
+        private void OnFileStatsClicked(object sender, RoutedEventArgs e)
+        {
+            // Ensure document is open.
+            if (this.graph is null)
+            {
+                MessageBox.Show("Must open document first");
+                return;
+            }
+
+            // Count types of each vertex.
+            Dictionary<string, int> vertexTypeCounts = new();
+            foreach (var vertex in this.graph.VerticiesById.Values)
+            {
+                if (!vertexTypeCounts.TryGetValue(vertex.label, out var value))
+                {
+                    vertexTypeCounts[vertex.label] = 1;
+                }
+                else
+                {
+                    vertexTypeCounts[vertex.label] = value + 1;
+                }
+            }
+
+            // Count types of each edge.
+            Dictionary<string, int> edgeTypeCounts = new();
+            foreach (var vertex in this.graph.EdgesById.Values)
+            {
+                if (!edgeTypeCounts.TryGetValue(vertex.label, out var value))
+                {
+                    edgeTypeCounts[vertex.label] = 1;
+                }
+                else
+                {
+                    edgeTypeCounts[vertex.label] = value + 1;
+                }
+            }
+
+            var output = $"Total lines: {this.graph.Lines.Count}\n" +
+                $"Verticies: {this.graph.VerticiesById.Count} ({(float)this.graph.VerticiesById.Count / this.graph.Lines.Count * 100}%)\n" +
+                $"Edges: {this.graph.EdgesById.Count} ({(float)this.graph.EdgesById.Count / this.graph.Lines.Count * 100}%)" +
+                $"\n\n---------------------\n";
+
+            foreach (var count in vertexTypeCounts.OrderByDescending(pair => pair.Value))
+            {
+                output += $"{count.Key} Vertices: {count.Value} ({(float)count.Value / this.graph.Lines.Count * 100}%) \n";
+            }
+
+            output += $"\n---------------------\n\n";
+
+            foreach (var count in edgeTypeCounts.OrderByDescending(pair => pair.Value))
+            {
+                output += $"{count.Key} Edges: {count.Value} ({(float)count.Value / this.graph.Lines.Count * 100}%) \n";
+            }
+
+            MessageBox.Show(output);
         }
     }
 }

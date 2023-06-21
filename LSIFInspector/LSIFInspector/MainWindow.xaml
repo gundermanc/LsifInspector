@@ -14,7 +14,8 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="File">
-                <MenuItem Header="Open" Click="OnFileOpenClicked"/>
+                <MenuItem Header="Open" Click="OnFileOpenClicked" />
+                <MenuItem Header="Stats" Click="OnFileStatsClicked" />
             </MenuItem>
             <MenuItem Header="Edit">
                 <MenuItem Header="Find" Click="OnFind" />
